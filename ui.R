@@ -1,25 +1,29 @@
-library(shiny)
+library(shinydashboard)
+library(DT)
 
-
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+dashboardPage(
+  dashboardHeader(
+    title="Econometric modelling"),
   
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("INPUT", tabName = "input", icon = icon("dashboard")),
+      menuItem("STATS", tabName = "stats", icon = icon("history"))
+    )
+  ),
   
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-    ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
+  dashboardBody(
+    tabItems(
+      tabItem(tabName = "input",
+        fileInput("upload", "Choose CSV File", accept = c(".csv", ".xlsx")),
+        
+        actionButton(
+          inputId = 'loadData',
+          label = 'LOAD FILE'
+        ),
+        
+        DT::DTOutput('head')
+      )
     )
   )
 )

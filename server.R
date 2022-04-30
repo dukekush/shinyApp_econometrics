@@ -1,14 +1,26 @@
-library(shiny)
+library(shinydashboard)
+library(DT)
 
-
-server <- function(input, output) {
+server <- function(input, output) { 
   
-  output$distPlot <- renderPlot({
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+  data <- reactive({
+    req(input$upload)
     
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+    ext <- tools::file_ext(input$upload$name)
+    switch(ext,
+           csv = vroom::vroom(input$upload$datapath, delim = ","),
+           xlsx = readxl::read_excel(input$upload$datapath),
+           validate("Invalid file; Please upload a .csv or .tsv file")
+    )
   })
+  
+  
+  output$head <- DT::renderDT({
+    input$loadData
+    
+    isolate(data())
+  })
+  
+  
+  
 }
